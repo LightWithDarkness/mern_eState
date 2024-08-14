@@ -1,11 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { reqStart,reqFailure, signInSuccess } from "../redux/user/user.slice";
 
 const SignUp = () => {
   const [userData, setUserData] = useState({});
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState(null);
+const {err, loading } = useSelector((state)=>state.user)
   const navigate = useNavigate();
+  const dispatch = useDispatch()
   // console.log(error)
 
   //handle change in inputs
@@ -18,8 +20,7 @@ const SignUp = () => {
     evt.preventDefault();
 
     try {
-      setLoading(true);
-      setError(null);
+      dispatch(reqStart())
       const res = await fetch("/api/v1/auth/signin", {
         method: "POST",
         headers: {
@@ -30,15 +31,13 @@ const SignUp = () => {
       const data = await res.json();
       console.log(data);
       if (data.success == false) {
-        setError(data);
-        setLoading(false);
+        dispatch(reqFailure(data))
         return;
       }
-      setLoading(false);
+      dispatch(signInSuccess(data.user))
       navigate("/");
     } catch (error) {
-      setError(error);
-      setLoading(false);
+      dispatch(reqFailure(error))
     }
   };
   return (
@@ -75,7 +74,7 @@ const SignUp = () => {
         </span>
       </div>
       <p className="text-red-600 py-5 text-center">
-        {error ? error.message : ""}
+        {err ? err.message : ""}
       </p>
     </div>
   );
