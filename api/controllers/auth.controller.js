@@ -69,10 +69,10 @@ const googleSignIn = async (req, res, next) => {
         username,
         email,
         password: hashedPassword,
-        profilePicture: photo,
+        avatar: photo,
       });
       await newUser.save();
-      const { password:pass, ...user } = newUser._doc;
+      const { password: pass, ...user } = newUser._doc;
       const token = jwt.sign({ id: newUser._id }, process.env.JWT_SECRET);
       res
         .cookie('access_token', token, { httpOnly: true, maxAge: 3600000 })
