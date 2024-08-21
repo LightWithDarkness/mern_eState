@@ -52,6 +52,7 @@ const {err, loading } = useSelector((state)=>state.user)
           placeholder="Email"
           className="p-3 bg-white rounded-lg"
           onChange={handleInputChange}
+          required
         />
         <input
           id="password"
@@ -59,6 +60,7 @@ const {err, loading } = useSelector((state)=>state.user)
           placeholder="Password"
           className="p-3 bg-white rounded-lg"
           onChange={handleInputChange}
+          required
         />
         <button
           disabled={loading}

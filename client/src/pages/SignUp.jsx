@@ -54,6 +54,7 @@ const SignUp = () => {
           placeholder="Username"
           className="p-3 bg-white rounded-lg"
           onChange={handleInputChange}
+          required
         />
         <input
           id="email"
@@ -61,6 +62,7 @@ const SignUp = () => {
           placeholder="Email"
           className="p-3 bg-white rounded-lg"
           onChange={handleInputChange}
+          required
         />
         <input
           id="password"
@@ -68,6 +70,7 @@ const SignUp = () => {
           placeholder="Password"
           className="p-3 bg-white rounded-lg"
           onChange={handleInputChange}
+          required
         />
         <button
           disabled={loading}

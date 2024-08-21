@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
+import { useNavigate , Link} from "react-router-dom";
 import { app } from "../firebase.js";
 import {
   getStorage,
@@ -124,7 +124,7 @@ const Profile = () => {
   };
 
   return (
-    <div className="flex flex-col max-w-lg mx-auto p-4 my-5">
+    <div className="flex flex-col max-w-lg mx-auto p-4 ">
       <h1 className="font-semibold text-3xl text-center py-4">Profile</h1>
       <form onSubmit={handleUpdateUser} className="flex flex-col gap-4">
         <input
@@ -137,7 +137,7 @@ const Profile = () => {
         <img
           src={userData.avatar || (currentUser && currentUser.avatar)}
           alt="profile"
-          className="my-4 w-24 h-24 rounded-full object-cover self-center cursor-pointer"
+          className="mt-3 w-24 h-24 rounded-full object-cover self-center cursor-pointer"
           onClick={() => fileRef.current.click()}
         />
         <p className="text-sm self-center">
@@ -186,6 +186,12 @@ const Profile = () => {
         >
           {loading ? "Processing..." : "Update"}
         </button>
+        <Link
+          className="bg-green-700 text-white p-3 rounded-lg text-center hover:opacity-95"
+          to="/create-listing"
+        >
+          Create Listing
+        </Link>
       </form>
       <div className="flex justify-between mt-5">
         <span
