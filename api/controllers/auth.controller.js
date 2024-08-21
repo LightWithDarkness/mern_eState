@@ -47,6 +47,20 @@ const signIn = async (req, res, next) => {
     next(error);
   }
 };
+const signOut = (req, res, next) => {
+  if (req.user.id != req.params.id)
+    return next(
+      customError(401, 'You can only signOut from your user id not others')
+    );
+  try {
+    res
+      .clearCookie('access_token', { httpOnly: true })
+      .status(200)
+      .json({ success: true, message: 'Sign out successful' });
+  } catch (error) {
+    next(error);
+  }
+};
 
 const googleSignIn = async (req, res, next) => {
   const { name, email, photo } = req.body;
@@ -84,4 +98,4 @@ const googleSignIn = async (req, res, next) => {
   }
 };
 
-export { signUp, signIn, googleSignIn };
+export { signUp, signIn, googleSignIn,signOut };

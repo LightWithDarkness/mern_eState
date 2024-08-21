@@ -12,6 +12,10 @@ import {
   reqStart,
   updateUserFailure,
   updateUserSuccess,
+  deleteUserFailure,
+  deleteUserSuccess,
+  signOutSuccess,
+  signOutFailure
 } from "../redux/user/user.slice.js";
 
 const Profile = () => {
@@ -80,9 +84,43 @@ const Profile = () => {
       dispatch(updateUserSuccess(data.user));
       setUpdateSuccess(true);
     } catch (error) {
-      console.log(error)
+      console.log(error);
       dispatch(updateUserFailure(error));
     }
+  };
+
+  const handleDeleteUser = async () => {
+    try {
+      dispatch(reqStart());
+      const res = await fetch(`/api/v1/user/delete/${currentUser._id}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!data.success) {
+        dispatch(deleteUserFailure(data));
+        return;
+      }
+      dispatch(deleteUserSuccess());
+      navigate("/");
+    } catch (error) {
+      dispatch(deleteUserFailure(error));
+    }
+  };
+  const handleSignOut = async () => {
+      try {
+        dispatch(reqStart());
+        const res = await fetch(`/api/v1/auth/signout/${currentUser._id}`);
+        const data = await res.json();
+        // console.log(data)
+        if (!data.success) {
+          dispatch(signOutFailure(data));
+          return;
+        }
+        dispatch(signOutSuccess());
+        navigate("/sign-in");
+      } catch (error) {
+        dispatch(signOutFailure(error));
+      }
   };
 
   return (
@@ -150,8 +188,15 @@ const Profile = () => {
         </button>
       </form>
       <div className="flex justify-between mt-5">
-        <span className="text-red-700 cursor-pointer">Delete Account</span>
-        <span className="text-red-700 cursor-pointer">Sign out</span>
+        <span
+          className="text-red-700 cursor-pointer"
+          onClick={handleDeleteUser}
+        >
+          Delete Account
+        </span>
+        <span className="text-red-700 cursor-pointer" onClick={handleSignOut}>
+          Sign out
+        </span>
       </div>
       <p className="text-red-500 mt-5 text-center">
         {err && (err.message || "Something went wrong")}
