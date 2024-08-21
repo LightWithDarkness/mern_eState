@@ -8,10 +8,16 @@ import {
   getDownloadURL,
   uploadBytesResumable,
 } from "firebase/storage";
+import {
+  reqStart,
+  updateUserFailure,
+  updateUserSuccess,
+} from "../redux/user/user.slice.js";
 
 const Profile = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const [updateSuccess, setUpdateSuccess] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [userData, setUserData] = useState({});
   const [progressPercent, setProgressPercent] = useState(0);
@@ -19,7 +25,7 @@ const Profile = () => {
   const [image, setImage] = useState(undefined);
   const { currentUser, err, loading } = useSelector((state) => state.user);
 
-  console.log(userData, progressPercent);
+  // console.log(userData, progressPercent);
   useEffect(() => {
     if (image) {
       handleImgUpload(image);
@@ -53,6 +59,30 @@ const Profile = () => {
   };
   const handleUpdateUser = async (evt) => {
     evt.preventDefault();
+    try {
+      dispatch(reqStart());
+      setUpdateSuccess(false);
+
+      const res = await fetch(`/api/v1/user/update/${currentUser._id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(userData),
+      });
+      // console.log(res);
+      const data = await res.json();
+      console.log(data);
+      if (!data.success) {
+        dispatch(updateUserFailure(data));
+        return;
+      }
+      dispatch(updateUserSuccess(data.user));
+      setUpdateSuccess(true);
+    } catch (error) {
+      console.log(error)
+      dispatch(updateUserFailure(error));
+    }
   };
 
   return (
@@ -74,7 +104,9 @@ const Profile = () => {
         />
         <p className="text-sm self-center">
           {imageError ? (
-            <span className="text-red-700">Error uploading (image must be less than 2 mb)</span>
+            <span className="text-red-700">
+              Error uploading (image must be less than 2 mb)
+            </span>
           ) : progressPercent > 0 && progressPercent < 100 ? (
             <span className="text-slate-700">{`Uploading: ${progressPercent}%`}</span>
           ) : progressPercent === 100 ? (
@@ -110,14 +142,23 @@ const Profile = () => {
             setUserData({ ...userData, [evt.target.id]: evt.target.value })
           }
         />
-        <button className="bg-slate-700 text-white p-3 rounded-lg hover:opacity-95 disabled:opacity-80">
-          Update
+        <button
+          disabled={loading}
+          className="bg-slate-700 text-white p-3 rounded-lg hover:opacity-95 disabled:opacity-80"
+        >
+          {loading ? "Processing..." : "Update"}
         </button>
       </form>
       <div className="flex justify-between mt-5">
         <span className="text-red-700 cursor-pointer">Delete Account</span>
         <span className="text-red-700 cursor-pointer">Sign out</span>
       </div>
+      <p className="text-red-500 mt-5 text-center">
+        {err && (err.message || "Something went wrong")}
+      </p>
+      <p className="text-green-500  text-center">
+        {updateSuccess && "user updated successfully"}
+      </p>
     </div>
   );
 };
