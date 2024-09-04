@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { useNavigate , Link} from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { app } from "../firebase.js";
 import {
   getStorage,
@@ -15,7 +15,7 @@ import {
   deleteUserFailure,
   deleteUserSuccess,
   signOutSuccess,
-  signOutFailure
+  signOutFailure,
 } from "../redux/user/user.slice.js";
 
 const Profile = () => {
@@ -24,12 +24,14 @@ const Profile = () => {
   const [updateSuccess, setUpdateSuccess] = useState(false);
   const [imageError, setImageError] = useState(false);
   const [userData, setUserData] = useState({});
+  const [showListingsError, setShowListingsError] = useState(false);
+  const [listings, setListings] = useState([]);
   const [progressPercent, setProgressPercent] = useState(0);
   const fileRef = useRef(null);
   const [image, setImage] = useState(undefined);
   const { currentUser, err, loading } = useSelector((state) => state.user);
 
-  // console.log(userData, progressPercent);
+  console.log(listings);
   useEffect(() => {
     if (image) {
       handleImgUpload(image);
@@ -107,20 +109,35 @@ const Profile = () => {
     }
   };
   const handleSignOut = async () => {
-      try {
-        dispatch(reqStart());
-        const res = await fetch(`/api/v1/auth/signout/${currentUser._id}`);
-        const data = await res.json();
-        // console.log(data)
-        if (!data.success) {
-          dispatch(signOutFailure(data));
-          return;
-        }
-        dispatch(signOutSuccess());
-        navigate("/sign-in");
-      } catch (error) {
-        dispatch(signOutFailure(error));
+    try {
+      dispatch(reqStart());
+      const res = await fetch(`/api/v1/auth/signout/${currentUser._id}`);
+      const data = await res.json();
+      // console.log(data)
+      if (!data.success) {
+        dispatch(signOutFailure(data));
+        return;
       }
+      dispatch(signOutSuccess());
+      navigate("/sign-in");
+    } catch (error) {
+      dispatch(signOutFailure(error));
+    }
+  };
+  const handleShowListings = async () => {
+    try {
+      setShowListingsError(false);
+      const res = await fetch(`/api/v1/user/listings/${currentUser._id}`);
+      const data = await res.json();
+      // console.log(data)
+      if (data.success === false) {
+        return setShowListingsError(true);
+      }
+      setListings(data.listings);
+    } catch (error) {
+      setShowListingsError(true);
+      console.log(error);
+    }
   };
 
   return (
@@ -204,12 +221,62 @@ const Profile = () => {
           Sign out
         </span>
       </div>
-      <p className="text-red-500 mt-5 text-center">
+      <p className="text-red-500 mt-2 text-center">
         {err && (err.message || "Something went wrong")}
       </p>
-      <p className="text-green-500  text-center">
+      <p className="text-green-700  text-center">
         {updateSuccess && "user updated successfully"}
       </p>
+      <button
+        type="button"
+        onClick={handleShowListings}
+        className="text-green-500 text-center w-full"
+      >
+        Show Listings
+      </button>
+      {showListingsError && (
+        <p className="text-red-700 mt-2 text-center">Error showing listings</p>
+      )}
+
+      {listings && listings.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <h1 className="text-center mt-7 text-2xl font-semibold">
+            Your Listings
+          </h1>
+          {listings.map((listing) => (
+            <div
+              key={listing._id}
+              className="border rounded-lg p-3 flex justify-between items-center gap-4"
+            >
+              <Link to={`/listing/${listing._id}`}>
+                <img
+                  src={listing.imageURLs[0]}
+                  alt="listing cover"
+                  className="h-16 w-16 object-contain"
+                />
+              </Link>
+              <Link
+                className="text-slate-700 font-semibold  hover:underline truncate flex-1"
+                to={`/listing/${listing._id}`}
+              >
+                <p>{listing.name}</p>
+              </Link>
+
+              <div className="flex flex-col item-center">
+                <button
+                  onClick={() => handleListingDelete(listing._id)}
+                  className="text-red-700 uppercase"
+                >
+                  Delete
+                </button>
+                <Link to={`/update-listing/${listing._id}`}>
+                  <button className="text-green-700 uppercase">Edit</button>
+                </Link>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 };

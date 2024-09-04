@@ -46,7 +46,7 @@ const listingSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    userRef: {
+    userId: {
       type: String,
       required: true,
     },

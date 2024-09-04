@@ -10,4 +10,5 @@ const createListing = async (req, res, next) => {
   }
 };
 
+
 export { createListing };

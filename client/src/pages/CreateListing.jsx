@@ -30,7 +30,7 @@ const CreateListing = () => {
     furnished: false,
     parking: false,
     offer: false,
-    userRef: currentUser._id,
+    userId: currentUser._id,
   });
   console.log(formData);
 

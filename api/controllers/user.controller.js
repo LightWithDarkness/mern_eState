@@ -1,5 +1,6 @@
 import jwt from 'jsonwebtoken';
 import User from '../models/user.model.js';
+import Listing from '../models/listing.model.js';
 import { customError } from '../utils/custom.error.js';
 
 const deleteAccount = async (req, res, next) => {
@@ -67,4 +68,22 @@ const updateAccount = async (req, res, next) => {
   }
 };
 
-export { deleteAccount, updateAccount };
+const getUserListing = async (req, res, next) => {
+  try {
+    if (req.user.id != req.params.id)
+      return next(customError(401,'you are not authorized, you can only view your Listings')
+      );
+    const listings = await Listing.find({ userId:req.params.id });
+    if (listings.length < 1) {
+      return next(customError(404, 'Listing does not exist'));
+    }
+    res.status(200).json({
+      success: true,
+      listings,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export { deleteAccount, updateAccount, getUserListing};
