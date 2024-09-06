@@ -131,12 +131,11 @@ const Profile = () => {
       const data = await res.json();
       // console.log(data)
       if (data.success === false) {
-        return setShowListingsError(true);
+        return setShowListingsError(data.message);
       }
       setListings(data.listings);
     } catch (error) {
-      setShowListingsError(true);
-      console.log(error);
+      setShowListingsError(error.message);
     }
   };
   const handleListingDelete = async (listingId) => {
@@ -252,7 +251,7 @@ const Profile = () => {
         Show Listings
       </button>
       {showListingsError && (
-        <p className="text-red-700 mt-2 text-center">Error showing listings</p>
+        <p className="text-red-700 mt-2 text-center">{showListingsError || 'Error showing listings'}</p>
       )}
 
       {listings && listings.length > 0 && (

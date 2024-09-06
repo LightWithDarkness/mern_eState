@@ -72,7 +72,7 @@ const UpdateListing = () => {
       if (!data.success) {
         return setErr(data.message);
       }
-      navigate(`/listing/${data._id}`);
+      navigate(`/listing/${data.listing._id}`);
     } catch (error) {
       setLoading(false);
       setErr(error.message);

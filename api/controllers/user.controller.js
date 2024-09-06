@@ -71,9 +71,13 @@ const updateAccount = async (req, res, next) => {
 const getUserListing = async (req, res, next) => {
   try {
     if (req.user.id != req.params.id)
-      return next(customError(401,'you are not authorized, you can only view your Listings')
+      return next(
+        customError(
+          401,
+          'you are not authorized, you can only view your Listings'
+        )
       );
-    const listings = await Listing.find({ userId:req.params.id });
+    const listings = await Listing.find({ userId: req.params.id });
     if (listings.length < 1) {
       return next(customError(404, 'Listing does not exist'));
     }
@@ -86,4 +90,18 @@ const getUserListing = async (req, res, next) => {
   }
 };
 
-export { deleteAccount, updateAccount, getUserListing};
+const getUser = async (req, res, next) => {
+  try {
+    const user = await User.findById(req.params.id).select('-password');
+    if (!user) {
+      return next(customError(404, 'User not found'));
+    }
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+export { deleteAccount, updateAccount, getUserListing, getUser };
