@@ -139,6 +139,23 @@ const Profile = () => {
       console.log(error);
     }
   };
+  const handleListingDelete = async (listingId) => {
+    try {
+      const res = await fetch(`/api/v1/listing/delete/${listingId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+      if (!data.success) {
+        console.log("error:", data.message);
+        return;
+      }
+      setListings((prev) =>
+        prev.filter((listing) => listing._id !== listingId)
+      );
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
 
   return (
     <div className="flex flex-col max-w-lg mx-auto p-4 ">

@@ -9,7 +9,7 @@ const signUp = async (req, res, next) => {
     //checking if user already exist
     const existingUser = await User.findOne({ $or: [{ username }, { email }] });
     if (existingUser) {
-      next(customError(400, 'user already exist! with same username or email'));
+      return next(customError(400, 'user already exist! with same username or email'));
     }
 
     //saving the new user
