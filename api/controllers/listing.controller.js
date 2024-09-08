@@ -19,7 +19,9 @@ const deleteListing = async (req, res, next) => {
   }
   //checking if the user is the owner of the listing
   if (req.user.id !== listing.userId) {
-    return next(customError(401, 'You can only delete your own listings not others'));
+    return next(
+      customError(401, 'You can only delete your own listings not others')
+    );
   }
 
   try {
@@ -40,7 +42,9 @@ const updateListing = async (req, res, next) => {
   }
   //checking if the user is the owner of the listing
   if (req.user.id !== listing.userId) {
-    return next(customError(401, 'You can only update your own listings not others'));
+    return next(
+      customError(401, 'You can only update your own listings not others')
+    );
   }
   try {
     const updatedListing = await Listing.findByIdAndUpdate(
@@ -65,5 +69,50 @@ const getListing = async (req, res, next) => {
     next(error);
   }
 };
+const searchListings = async (req, res, next) => {
+  try {
+    let { type, offer, parking, furnished, limit, startIdx } = req.query;
+    const searchTerm = req.query.searchTerm || '';
+    const sort = req.query.sort || 'createdAt';
+    const order = req.query.order || 'desc';
 
-export { createListing, deleteListing, updateListing , getListing};
+    limit = parseInt(limit) || 10;
+    startIdx = parseInt(startIdx) || 0;
+
+    if (offer === undefined || offer === "false") {
+      offer = { $in: [false, true] };
+    }
+    if (type === undefined || type === 'all') {
+      type = { $in: ['sale', 'rent'] };
+    }
+    if (parking === undefined || parking === "false") {
+      parking = { $in: [false, true] };
+    }
+    if (furnished === undefined || furnished === "false") {
+      furnished = { $in: [false, true] };
+    }
+    const listings = await Listing.find({
+      name: { $regex: searchTerm, $options: 'i' },
+      address: { $regex: searchTerm, $options: 'i' },
+      type,
+      offer,
+      furnished,
+      parking,
+    })
+      .sort({ [sort]: order })
+      .limit(limit)
+      .skip(startIdx);
+
+    return res.status(200).json({ success: true, listings });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export {
+  createListing,
+  deleteListing,
+  updateListing,
+  getListing,
+  searchListings,
+};
