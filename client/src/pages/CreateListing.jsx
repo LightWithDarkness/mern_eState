@@ -23,8 +23,8 @@ const CreateListing = () => {
     description: "",
     address: "",
     type: "rent",
-    regularPrize: 500,
-    discountPrize: 0,
+    regularPrice: 500,
+    discountPrice: 0,
     bathrooms: 1,
     bedrooms: 1,
     furnished: false,
@@ -39,7 +39,7 @@ const CreateListing = () => {
     try {
       if (formData.imageURLs.length < 1)
         return setErr("You must upload at least one image");
-      if (+formData.regularPrize < +formData.discountPrize)
+      if (+formData.regularPrice < +formData.discountPrice)
         return setErr("Discount price must be lower than regular price");
 
       setLoading(true);
@@ -49,7 +49,12 @@ const CreateListing = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          discountPrice: formData.offer
+            ? formData.discountPrice
+            : formData.regularPrice,
+        }),
       });
       const data = await res.json();
       setLoading(false);
@@ -257,12 +262,12 @@ const CreateListing = () => {
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                id="regularPrize"
+                id="regularPrice"
                 min="500"
                 max="10000000"
                 required
                 className="p-3 border border-gray-300 rounded-lg"
-                value={formData.regularPrize}
+                value={formData.regularPrice}
                 onChange={handleInputChange}
               />
               <div className="flex flex-col items-center">
@@ -276,12 +281,12 @@ const CreateListing = () => {
               <div className="flex items-center gap-2">
                 <input
                   type="number"
-                  id="discountPrize"
+                  id="discountPrice"
                   min="400"
                   max="10000000"
                   required
                   className="p-3 border border-gray-300 rounded-lg"
-                  value={formData.discountPrize}
+                  value={formData.discountPrice}
                   onChange={handleInputChange}
                 />
                 <div className="flex flex-col items-center">

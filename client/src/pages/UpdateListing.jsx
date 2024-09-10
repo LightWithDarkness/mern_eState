@@ -24,8 +24,8 @@ const UpdateListing = () => {
     description: "",
     address: "",
     type: "rent",
-    regularPrize: 500,
-    discountPrize: 0,
+    regularPrice: 500,
+    discountPrice: 0,
     bathrooms: 1,
     bedrooms: 1,
     furnished: false,
@@ -54,8 +54,8 @@ const UpdateListing = () => {
     evt.preventDefault();
     try {
       if (formData.imageURLs.length < 1)
-        return setErr("You must upload at least one image");
-      if (+formData.regularPrize < +formData.discountPrize)
+        return setErr("You must upload at-least one image");
+      if (+formData.regularPrice < +formData.discountPrice)
         return setErr("Discount price must be lower than regular price");
 
       setLoading(true);
@@ -65,7 +65,12 @@ const UpdateListing = () => {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          discountPrice: formData.offer
+            ? formData.discountPrice
+            : formData.regularPrice,
+        }),
       });
       const data = await res.json();
       setLoading(false);
@@ -156,9 +161,7 @@ const UpdateListing = () => {
 
   return (
     <main className="max-w-4xl mx-auto p-3">
-      <h1 className="text-3xl font-bold my-7 text-center">
-        Update a Listing
-      </h1>
+      <h1 className="text-3xl font-bold my-7 text-center">Update a Listing</h1>
       <form
         onSubmit={handleUpdateListing}
         className="flex flex-col sm:flex-row gap-4"
@@ -275,12 +278,12 @@ const UpdateListing = () => {
             <div className="flex items-center gap-2">
               <input
                 type="number"
-                id="regularPrize"
+                id="regularPrice"
                 min="500"
                 max="10000000"
                 required
                 className="p-3 border border-gray-300 rounded-lg"
-                value={formData.regularPrize}
+                value={formData.regularPrice}
                 onChange={handleInputChange}
               />
               <div className="flex flex-col items-center">
@@ -294,12 +297,12 @@ const UpdateListing = () => {
               <div className="flex items-center gap-2">
                 <input
                   type="number"
-                  id="discountPrize"
+                  id="discountPrice"
                   min="400"
                   max="10000000"
                   required
                   className="p-3 border border-gray-300 rounded-lg"
-                  value={formData.discountPrize}
+                  value={formData.discountPrice}
                   onChange={handleInputChange}
                 />
                 <div className="flex flex-col items-center">
@@ -364,7 +367,7 @@ const UpdateListing = () => {
             disabled={loading || uploading}
             className="bg-slate-700 text-white p-3 rounded uppercase hover:opacity-95 disabled:opacity-80"
           >
-            {loading ? "Creating..." : "Update Listing"}
+            {loading ? "Updating..." : "Update Listing"}
           </button>
           {err && <p className="text-sm text-red-600">{err}</p>}
         </div>

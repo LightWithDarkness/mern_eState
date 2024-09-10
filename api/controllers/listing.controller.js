@@ -76,21 +76,22 @@ const searchListings = async (req, res, next) => {
     const sort = req.query.sort || 'createdAt';
     const order = req.query.order || 'desc';
 
-    limit = parseInt(limit) || 10;
+    limit = parseInt(limit) || 9;
     startIdx = parseInt(startIdx) || 0;
 
-    if (offer === undefined || offer === "false") {
+    if (offer === undefined || offer === 'false') {
       offer = { $in: [false, true] };
     }
     if (type === undefined || type === 'all') {
       type = { $in: ['sale', 'rent'] };
     }
-    if (parking === undefined || parking === "false") {
+    if (parking === undefined || parking === 'false') {
       parking = { $in: [false, true] };
     }
-    if (furnished === undefined || furnished === "false") {
+    if (furnished === undefined || furnished === 'false') {
       furnished = { $in: [false, true] };
     }
+
     const listings = await Listing.find({
       name: { $regex: searchTerm, $options: 'i' },
       address: { $regex: searchTerm, $options: 'i' },
