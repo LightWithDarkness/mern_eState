@@ -1,17 +1,17 @@
 {
   "name": "kumar_estate",
   "version": "1.0.0",
-  "description": "A real estate mern app with tailwind css",
+  "description": "A real estate MERN app with tailwind css, JWT etc.",
   "main": "index.js",
   "type": "module",
   "scripts": {
     "dev": "nodemon api/index.js",
     "start": "node api/index.js",
-    "build": "npm install && npm install --prefix client && npm run build --prefix client"
+    "build": "npm install --prefix client && npm run build --prefix client && npm install"
   },
   "author": "Mannu Kumar Verma",
   "license": "ISC",
-   "dependencies": {
+  "dependencies": {
     "bcryptjs": "^2.4.3",
     "cookie-parser": "^1.4.6",
     "dotenv": "^16.3.1",

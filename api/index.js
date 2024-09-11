@@ -6,10 +6,14 @@ import authRoutes from './routes/auth.route.js';
 import userRoutes from './routes/user.route.js';
 import  listingRoutes from './routes/listing.route.js'
 import { errorHandler } from './utils/middlewares/error.handler.js';
+import { fileURLToPath } from 'url';
+import path from 'path';
 
 config();
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 app.use(express.json());
 app.use(cookieParser());
@@ -19,6 +23,12 @@ app.use('/api/v1/user', userRoutes);
 app.use('/api/v1/listing', listingRoutes);
 //Middlewares
 app.use(errorHandler);
+// for deployment
+app.use(express.static(path.join(__dirname, '../client/dist')));
+app.get('*', (req, res) => {
+  res.sendFile(path.resolve(__dirname, '../client/dist', 'index.html'));
+});
+
 
 const start = async () => {
   try {
