@@ -32,7 +32,7 @@ app.get('*', (req, res) => {
 
 const start = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI_LOCAL);
+    await mongoose.connect(process.env.MONGO_URI);
     app.listen(port, () => console.log(`API listening on port ${port}!`));
   } catch (error) {
     console.log(error);
